@@ -3,10 +3,11 @@
 #include <string>
 
 namespace SII {
-    class serviceManager{
+    class Service{
         public:
-            serviceManager(const std::string& config_path); 
+            Service(const std::string& name);
         private:
+            std::string name;
     };
 } //namespace SII
 #endif //SERVICE_HPP

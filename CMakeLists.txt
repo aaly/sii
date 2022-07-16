@@ -46,7 +46,7 @@ file(GLOB ZENOHPICO_SOURCES "${zenohpico_SOURCE_DIR}/src/*.c"
                      "${zenohpico_SOURCE_DIR}/src/transport/multicast/link/task/*.c")
 
 # add the executable
-add_executable(sii src/main.cpp src/service_manager.cpp src/common.cpp ${ZENOHPICO_SOURCES})
+add_executable(sii src/main.cpp src/service_manager.cpp src/service.cpp src/common.cpp ${ZENOHPICO_SOURCES})
 target_include_directories(sii PUBLIC "include" ${zenohpico_SOURCE_DIR}/include)
 target_compile_definitions(sii PUBLIC -DZENOH_LINUX)
 #target_link_libraries(sii zenohpico)

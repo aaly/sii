@@ -10,8 +10,8 @@ namespace SII {
         json_config_stream >> config_json;
         for(const auto& service: config_json["services"]) {
             std::cerr << "Name:" << service["name"] << std::endl;
+            m_services.emplace(service["name"],  SII::Service(service["name"]));
         }
-
     }
 
     serviceManager::~serviceManager(){
