@@ -1,0 +1,11 @@
+{
+    "name": "test sii",
+    "services": [
+        {
+            "name":"unikernel",
+            "exe": "/usr/local/sii/unikernel_kvm",
+            "parameters":[]
+        }
+    ]
+}
+
