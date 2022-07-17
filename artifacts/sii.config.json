@@ -5,7 +5,13 @@
             "name":"unikernel",
             "exe": "/usr/local/sii/unikernel_kvm",
             "parameters":[]
+        },
+        {
+            "name":"lscpu",
+            "exe": "/usr/bin/lscpu",
+            "parameters":[]
         }
+
     ]
 }
 

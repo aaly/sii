@@ -37,6 +37,7 @@ file(GLOB ZENOHPICO_SOURCES "${zenohpico_SOURCE_DIR}/src/*.c"
                      "${zenohpico_SOURCE_DIR}/src/system/unix/*.c"
                      "${zenohpico_SOURCE_DIR}/src/zenoh/transport/*.c"
                      "${zenohpico_SOURCE_DIR}/src/zenoh/transport/link/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/link/task/*.c"
                      "${zenohpico_SOURCE_DIR}/src/zenoh/transport/common/*.c"
                      "${zenohpico_SOURCE_DIR}/src/zenoh/transport/unicast/*.c"
                      "${zenohpico_SOURCE_DIR}/src/zenoh/transport/unicast/link/*.c"
@@ -46,12 +47,12 @@ file(GLOB ZENOHPICO_SOURCES "${zenohpico_SOURCE_DIR}/src/*.c"
                      "${zenohpico_SOURCE_DIR}/src/zenoh/transport/multicast/link/task/*.c")
 message(WARNING "zenohpico files: ${ZENOHPICO_SOURCES}")
 
-#add_library(zenohpico_lib STATIC ${ZENOHPICO_SOURCES})
-#target_include_directories(zenohpico_lib PUBLIC "include" ${zenohpico_SOURCE_DIR}/include)
-#target_compile_definitions(zenohpico_lib PUBLIC -DZENOH_LINUX)
+add_library(zenohpico_lib STATIC ${ZENOHPICO_SOURCES})
+target_include_directories(zenohpico_lib PUBLIC "include" ${zenohpico_SOURCE_DIR}/include)
+target_compile_definitions(zenohpico_lib PUBLIC -DZENOH_LINUX)
 
 # add the executable
-add_executable(sii src/main.cpp src/service_manager.cpp src/service.cpp src/common.cpp ${ZENOHPICO_SOURCES})
+add_executable(sii src/main.cpp src/service_manager.cpp src/service.cpp src/common.cpp)
 target_include_directories(sii PUBLIC "include" ${zenohpico_SOURCE_DIR}/include)
 target_compile_definitions(sii PUBLIC -DZENOH_LINUX)
-target_link_libraries(sii pthread)
+target_link_libraries(sii pthread zenohpico_lib)

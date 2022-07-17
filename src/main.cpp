@@ -23,8 +23,8 @@ int main() {
         SII::serviceManager sManager(selected_config_path);
         sManager.Run();
     }
-    catch (std::exception&) {
-        std::cerr << "exception in main()" << std::endl;
+    catch (std::exception& e) {
+        std::cerr << "exception in main(): " << e.what() << std::endl;
     }
 
     return 0;;
