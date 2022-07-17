@@ -9,7 +9,9 @@ namespace SII {
     class serviceManager{
         public:
             serviceManager(const std::string& config_path);
-           ~serviceManager(); 
+           ~serviceManager();
+
+           int Run(const std::string& router_address = "");
         private:
            std::unordered_map<std::string, SII::Service> m_services;
     };

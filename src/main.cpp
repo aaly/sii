@@ -2,10 +2,13 @@
 #include <deque>
 #include <filesystem>
 
-std::deque<std::string> default_config_paths = {"sii.config.json", "/usr/share/sii/sii.config.json"};
+std::deque<std::string> default_config_paths = {
+    "sii.config.json", "/usr/share/sii/sii.config.json"
+};
 
 int main() {
     std::string selected_config_path;
+
     try {
         default_config_paths.push_front(SII::getHomeDirectory()+ "/.sii.config.json");
         std::cerr << "home path:" << default_config_paths[0] << std::endl;
@@ -18,9 +21,11 @@ int main() {
         }
 
         SII::serviceManager sManager(selected_config_path);
+        sManager.Run();
     }
     catch (std::exception&) {
         std::cerr << "exception in main()" << std::endl;
-}
+    }
+
     return 0;;
 }

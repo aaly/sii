@@ -15,9 +15,6 @@ FetchContent_Declare(zenohpico
     GIT_REPOSITORY https://github.com/eclipse-zenoh/zenoh-pico.git
     GIT_TAG 0.5.0-beta.9)
 
-#FetchContent_Populate(zenohpico)
-#FetchContent_MakeAvailable(zenohpico)
-
 if(NOT zenohpico_POPULATED)
     message(STATUS "populating zenohpico")
     FetchContent_Populate(zenohpico)
@@ -27,26 +24,34 @@ endif()
 file(GLOB ZENOHPICO_SOURCES "${zenohpico_SOURCE_DIR}/src/*.c"
                      "${zenohpico_SOURCE_DIR}/src/api/*.c"
                      "${zenohpico_SOURCE_DIR}/src/collections/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/link/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/link/config/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/link/unicast/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/link/multicast/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/link/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/link/config/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/link/unicast/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/link/multicast/*.c"
                      "${zenohpico_SOURCE_DIR}/src/protocol/*.c"
                      "${zenohpico_SOURCE_DIR}/src/zenoh/protocol/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/session/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/link/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/session/*.c"
                      "${zenohpico_SOURCE_DIR}/src/system/*.c"
                      "${zenohpico_SOURCE_DIR}/src/system/unix/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/transport/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/transport/common/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/transport/unicast/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/transport/unicast/link/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/transport/unicast/link/task/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/transport/multicast/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/transport/multicast/link/*.c"
-                     "${zenohpico_SOURCE_DIR}/src/transport/multicast/link/task/*.c")
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/link/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/common/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/unicast/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/unicast/link/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/unicast/link/task/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/multicast/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/multicast/link/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/zenoh/transport/multicast/link/task/*.c")
+message(WARNING "zenohpico files: ${ZENOHPICO_SOURCES}")
+
+#add_library(zenohpico_lib STATIC ${ZENOHPICO_SOURCES})
+#target_include_directories(zenohpico_lib PUBLIC "include" ${zenohpico_SOURCE_DIR}/include)
+#target_compile_definitions(zenohpico_lib PUBLIC -DZENOH_LINUX)
 
 # add the executable
 add_executable(sii src/main.cpp src/service_manager.cpp src/service.cpp src/common.cpp ${ZENOHPICO_SOURCES})
 target_include_directories(sii PUBLIC "include" ${zenohpico_SOURCE_DIR}/include)
 target_compile_definitions(sii PUBLIC -DZENOH_LINUX)
-#target_link_libraries(sii zenohpico)
+#target_link_libraries(sii zenohpico_lib)
