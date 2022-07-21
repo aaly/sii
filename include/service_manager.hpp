@@ -15,9 +15,20 @@ extern "C"{
 #include <mutex>
 #include <condition_variable>
 
+#include <algorithm>
+#include <fstream>
+
 namespace SII {
+
     // add nlohmann::json as json for protability...
     using json = nlohmann::json;
+
+
+     // divide used jiffies by total https://rosettacode.org/wiki/Linux_CPU_utilization#C
+    std::vector<size_t> get_cpu_times();
+    bool get_cpu_times(size_t &idle_time, size_t &total_time);
+
+
 
     // beautiofully done at https://ncona.com/2019/05/using-thread-pools-in-cpp/
     // This class manages a thread pool that will process requests
@@ -92,6 +103,9 @@ namespace SII {
       void doWork() {
         // Loop while the queue is not destructing
         while (!done) {
+          std::function<void(const json message_json)> service_callback;
+//          queue_element([](const json msg) {;}, json());
+          json service_json;
           // Create a scope, so we don't lock the queue for longer than necessary
           {
             std::unique_lock<std::mutex> g(workQueueMutex);
@@ -106,10 +120,33 @@ namespace SII {
               break;
             }
 
-            auto queue_element = workQueue.front();
-            queue_element.first(queue_element.second);
+            auto pop_element =  workQueue.front();
             workQueue.pop();
+            service_callback = pop_element.first;
+            service_json = pop_element.second;
           }
+
+          struct timespec old_ts = {};
+          clock_gettime(CLOCK_THREAD_CPUTIME_ID, &old_ts);
+          size_t old_idle_time = 0;
+          size_t old_total_time = 0;
+          get_cpu_times(old_idle_time, old_total_time);
+          service_callback(service_json);
+          struct timespec current_ts = {};
+          clock_gettime(CLOCK_THREAD_CPUTIME_ID, &current_ts);
+          size_t current_idle_time = 0;
+          size_t current_total_time = 0;
+          get_cpu_times(current_idle_time, current_total_time);
+          auto tv_nsec = current_ts.tv_nsec - old_ts.tv_nsec;
+          int nb = sysconf(_SC_NPROCESSORS_ONLN);
+          long long tv_nsec_hertz = (1/(float)(tv_nsec/(float)1000000000));
+          size_t cpu_useage = (nb * 100.0 * tv_nsec_hertz) / float(current_total_time - old_total_time);
+
+          printf("Raw nanoseconds: %09ld\n", (intmax_t)tv_nsec);
+          printf("Raw nanoseconds to hertz: %09ld\n", (intmax_t)tv_nsec_hertz);
+          printf("CPU Utilization: %jd\n", (intmax_t)cpu_useage);
+
+
         }
       }
 

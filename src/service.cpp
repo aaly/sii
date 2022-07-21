@@ -6,6 +6,7 @@
 #include <thread>
 
 namespace SII {
+
     Service::Service(const std::string& name, const std::string& exe) : name(name), exe(exe) {
         
     }
