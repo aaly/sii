@@ -8,7 +8,9 @@ namespace SII {
         std::ifstream proc_stat("/proc/stat");
         proc_stat.ignore(5, ' '); // Skip the 'cpu' prefix.
         std::vector<size_t> times;
-        for (size_t time; proc_stat >> time; times.push_back(time));
+        for (size_t time; proc_stat >> time; times.push_back(time)) {
+            ;
+        }
           return times;
        }
   
@@ -77,21 +79,22 @@ namespace SII {
         zn_properties_t *config = zn_config_default();
         if(router_address.size()) {
             zn_properties_insert(config, ZN_CONFIG_PEER_KEY, z_string_make(router_address.c_str()));
+            m_threadPool.setRouterAddress(router_address);
         }
 
         printf("Openning session...\n");
-        zn_session_t *s = zn_open(config);
-        if (s == 0)
+        m_zenoh_session = zn_open(config);
+        if (m_zenoh_session == 0)
         {
             throw std::runtime_error("Unable to open session!\n");
         }
 
         // Start the read session session lease loops
-        znp_start_read_task(s);
-        znp_start_lease_task(s);
+        znp_start_read_task(m_zenoh_session);
+        znp_start_lease_task(m_zenoh_session);
     
         printf("Declaring Subscriber on '%s'...\n", topic_path.c_str());
-        zn_subscriber_t *sub = zn_declare_subscriber(s, zn_rname(topic_path.c_str()), zn_subinfo_default(), dataHandler, this);
+        zn_subscriber_t *sub = zn_declare_subscriber(m_zenoh_session, zn_rname(topic_path.c_str()), zn_subinfo_default(), dataHandler, this);
         if (sub == 0)
         {
             throw std::runtime_error("Unable to declare subscriber.\n");
@@ -104,7 +107,7 @@ namespace SII {
         }
     
         zn_undeclare_subscriber(sub);
-        zn_close(s);
+        zn_close(m_zenoh_session);
     
         return 0;
     }

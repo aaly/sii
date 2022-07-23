@@ -51,6 +51,48 @@ namespace SII {
           // the first argument, and the current object as second argument
           threads.push_back(std::thread(&ThreadPool::doWork, this));
         }
+
+        m_zenoh_config = zn_config_default();
+        if(m_router_address.size()) {
+            zn_properties_insert(m_zenoh_config, ZN_CONFIG_PEER_KEY, z_string_make(m_router_address.c_str()));
+          }
+          
+         m_zenoh_session = zn_open(m_zenoh_config);
+         if (m_zenoh_session == 0)
+        {
+              throw std::runtime_error("Unable to open session!\n");
+          }
+  
+          // Start the read session session lease loops
+         znp_start_read_task(m_zenoh_session);
+         znp_start_lease_task(m_zenoh_session);
+          
+
+
+
+      }
+
+      void setRouterAddress(const std::string& router_address) {
+        m_zenoh_config = zn_config_default();
+        if(router_address.size()) {
+            zn_properties_insert(m_zenoh_config, ZN_CONFIG_PEER_KEY, z_string_make(router_address.c_str()));
+        }
+
+        m_zenoh_session = zn_open(m_zenoh_config);
+        if (m_zenoh_session == 0)
+        {
+            throw std::runtime_error("Unable to open session!\n");
+        }
+
+        // Start the read session session lease loops
+        znp_start_read_task(m_zenoh_session);
+        znp_start_lease_task(m_zenoh_session);
+
+        const std::string m_pub_path = "/services/utilization";
+        printf("Declaring Resource '%s'", m_pub_path.c_str());
+        unsigned long rid = zn_declare_resource(m_zenoh_session, zn_rname(m_pub_path.c_str()));
+        printf(" => RId %lu\n", rid);
+        m_pub_key = zn_rid(rid);
       }
 
       // The destructor joins all the threads so the program can exit gracefully.
@@ -65,6 +107,11 @@ namespace SII {
           if (thread.joinable()) {
             thread.join();
           }
+        }
+        if(m_zenoh_session) {
+            znp_stop_read_task(m_zenoh_session);
+            znp_stop_lease_task(m_zenoh_session);
+            zn_close(m_zenoh_session);
         }
       }
 
@@ -82,12 +129,18 @@ namespace SII {
       }
 
      private:
+
+      zn_session_t* m_zenoh_session = nullptr;
+      zn_reskey_t m_pub_key = {0};
+      zn_properties_t* m_zenoh_config = nullptr;
+      std::string m_router_address;
+
       // This condition variable is used for the threads to wait until there is work
       // to do
       std::condition_variable_any workQueueConditionVariable;
 
       // We store the threads in a vector, so we can later stop them gracefully
-      std::vector<std::thread> threads;
+     std::vector<std::thread> threads;
 
       // Mutex to protect workQueue
       std::mutex workQueueMutex;
@@ -145,10 +198,17 @@ namespace SII {
           printf("Raw nanoseconds: %09ld\n", (intmax_t)tv_nsec);
           printf("Raw nanoseconds to hertz: %09ld\n", (intmax_t)tv_nsec_hertz);
           printf("CPU Utilization: %jd\n", (intmax_t)cpu_useage);
-
-
+          //reportUtilization();
         }
       }
+
+      void reportUtilization(const json& exec_result) {
+        if (m_zenoh_session) {
+            const std::string json_string = exec_result.dump();
+            std::cerr << "Writing Data " << json_string << std::endl;
+            zn_write(m_zenoh_session, m_pub_key, (const uint8_t *)json_string.c_str(), json_string.size());
+       }
+     }
 
     };
 
@@ -164,6 +224,7 @@ namespace SII {
            std::map<std::string, SII::Service> m_services;
            std::map<std::string, std::function<void(const json message_json)>> m_eventHandlers;
            ThreadPool m_threadPool;
+           zn_session_t* m_zenoh_session = nullptr;
     };
 } //namespace SII
 #endif //SERVICE_MANAGER_HPP
