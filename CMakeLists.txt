@@ -54,5 +54,5 @@ target_compile_definitions(zenohpico_lib PUBLIC -DZENOH_LINUX)
 # add the executable
 add_executable(sii src/main.cpp src/service_manager.cpp src/service.cpp src/common.cpp)
 target_include_directories(sii PUBLIC "include" ${zenohpico_SOURCE_DIR}/include)
-target_compile_definitions(sii PUBLIC -DZENOH_LINUX)
+target_compile_definitions(sii PUBLIC -DZENOH_LINUX stdc++fs)
 target_link_libraries(sii pthread zenohpico_lib)
