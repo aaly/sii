@@ -20,8 +20,13 @@ int main() {
             }
         }
 
-        SII::serviceManager sManager(selected_config_path);
-        sManager.Run();
+        if(selected_config_path.size()) {
+            SII::serviceManager sManager(selected_config_path);
+            sManager.Run();
+        }
+        else {
+            throw std::runtime_error("Could not find any config file");
+        }
     }
     catch (std::exception& e) {
         std::cerr << "exception in main(): " << e.what() << std::endl;
