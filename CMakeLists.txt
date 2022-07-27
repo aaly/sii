@@ -7,7 +7,7 @@ project(sii)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_BUILD_TYPE RELEASE)
+set(CMAKE_BUILD_TYPE DEBUG)
 
 include(FetchContent)
 
@@ -22,6 +22,9 @@ if(NOT zenohpico_POPULATED)
 endif()
 
 file(GLOB ZENOHPICO_SOURCES "${zenohpico_SOURCE_DIR}/src/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/compat/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/net/*.c"
+                     "${zenohpico_SOURCE_DIR}/src/net/unix/*.c"
                      "${zenohpico_SOURCE_DIR}/src/api/*.c"
                      "${zenohpico_SOURCE_DIR}/src/collections/*.c"
                      "${zenohpico_SOURCE_DIR}/src/zenoh/link/*.c"
