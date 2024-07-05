@@ -1,4 +1,4 @@
-#rm -rf build
+rm -rf build
 mkdir build
 cd build
 export CC=/usr/bin/clang

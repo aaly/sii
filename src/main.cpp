@@ -22,7 +22,9 @@ int main() {
 
         if(selected_config_path.size()) {
             SII::serviceManager sManager(selected_config_path);
-            sManager.Run();
+//            sManager.Run("137.204.57.224");
+              sManager.Run();
+              std::cerr << "Done running" << std::endl;
         }
         else {
             throw std::runtime_error("Could not find any config file");

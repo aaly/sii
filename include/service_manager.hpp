@@ -51,25 +51,23 @@ namespace SII {
           // the first argument, and the current object as second argument
           threads.push_back(std::thread(&ThreadPool::doWork, this));
         }
+      }
 
-        m_zenoh_config = zn_config_default();
-        if(m_router_address.size()) {
-            zn_properties_insert(m_zenoh_config, ZN_CONFIG_PEER_KEY, z_string_make(m_router_address.c_str()));
-          }
-          
+        void Init() {  
+            m_zenoh_config = zn_config_default();
+            if(m_router_address.size()) {
+                zn_properties_insert(m_zenoh_config, ZN_CONFIG_PEER_KEY, z_string_make(m_router_address.c_str()));
+            }
+
          m_zenoh_session = zn_open(m_zenoh_config);
-         if (m_zenoh_session == 0)
-        {
+         if (m_zenoh_session == 0) {
+              std::cerr << " AT C" << std::endl << std::flush;
               throw std::runtime_error("Unable to open session!\n");
-          }
-  
-          // Start the read session session lease loops
+         }
+
+         // Start the read session session lease loops
          znp_start_read_task(m_zenoh_session);
          znp_start_lease_task(m_zenoh_session);
-          
-
-
-
       }
 
       void setRouterAddress(const std::string& router_address) {
@@ -108,6 +106,7 @@ namespace SII {
             thread.join();
           }
         }
+
         if(m_zenoh_session) {
             znp_stop_read_task(m_zenoh_session);
             znp_stop_lease_task(m_zenoh_session);

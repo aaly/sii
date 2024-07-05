@@ -30,7 +30,7 @@ namespace SII {
         nlohmann::json config_json;
         json_config_stream >> config_json;
         for(const auto& service: config_json["services"]) {
-            std::cerr << "Name:" << service["name"] << std::endl;
+            std::cerr << "Found service:" << service["name"] << std::endl;
             m_services.emplace(service["name"],  SII::Service(service["name"], service["exe"]));
         }
 
@@ -46,9 +46,12 @@ namespace SII {
             }
         };
 
+        m_threadPool.Init();
+
     }
 
     serviceManager::~serviceManager(){
+        std::cerr << "dtor of serviceManager" << std::endl << std::flush;
     }
 
     void serviceManager::dataHandler(const zn_sample_t *sample, const void *arg)

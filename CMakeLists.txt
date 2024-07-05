@@ -13,7 +13,7 @@ include(FetchContent)
 
 FetchContent_Declare(zenohpico
     GIT_REPOSITORY https://github.com/eclipse-zenoh/zenoh-pico.git
-    GIT_TAG 0.5.0-beta.9)
+    GIT_TAG 0.5.0-beta.8)
 
 if(NOT zenohpico_POPULATED)
     message(STATUS "populating zenohpico")
